@@ -3,7 +3,6 @@ package com.wildcodeschool.webook.Auth.domain.service;
 import com.wildcodeschool.webook.Auth.domain.dto.UserDTO;
 import com.wildcodeschool.webook.Auth.domain.entity.User;
 import com.wildcodeschool.webook.Auth.infrastructure.repository.UserRepository;
-import com.wildcodeschool.webook.fileUpload.domain.service.UploadService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,7 @@ public class UserRegistrationService {
     private final RoleService roleService;
 
     public UserRegistrationService(UserRepository repository, BCryptPasswordEncoder bcryptPwEncoder,
-                                   UserMapper userMapper, RoleService roleService, UploadService uploadService) {
+                                   UserMapper userMapper, RoleService roleService) {
         this.repository = repository;
         this.bcryptPwEncoder = bcryptPwEncoder;
         this.userMapper = userMapper;

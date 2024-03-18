@@ -1,5 +1,6 @@
 package com.wildcodeschool.webook.Auth.domain.service;
 
+import com.wildcodeschool.webook.Auth.domain.dto.PasswordDTO;
 import com.wildcodeschool.webook.Auth.domain.dto.UserDTO;
 import com.wildcodeschool.webook.Auth.domain.entity.User;
 import com.wildcodeschool.webook.Auth.infrastructure.exception.NotFoundException;
@@ -8,6 +9,7 @@ import com.wildcodeschool.webook.book.domain.entity.Book;
 import com.wildcodeschool.webook.book.domain.service.CategoryService;
 import com.wildcodeschool.webook.book.infrastructure.repository.BookRepository;
 import com.wildcodeschool.webook.book.infrastructure.repository.CategoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,10 +53,8 @@ public class UserService {
         return repository.findById(id)
                 .map(user -> {
                     user.setUsername(newUser.getUsername());
-                    user.setPassword(newUser.getPassword());
                     user.setCity(newUser.getCity());
                     user.setZip_code(newUser.getZip_code());
-                    user.setPreferences(newUser.getPreferences());
 
                     if (!newUser.getBooks().isEmpty()) {
                         for (Book book : newUser.getBooks()) {
@@ -68,6 +68,24 @@ public class UserService {
                                 .stream().map(preference -> categoryService.updateCategory(preference, preference.getId()));
                     }
                     return userMapper.transformUserEntityInUserDTO(repository.save(user));
+                })
+                .orElseThrow(NotFoundException::new);
+    }
+
+    public HttpStatus updatePassword(PasswordDTO passwords, Long id) {
+        String userOldPw = repository.findById(id)
+                .map(user -> user.getPassword())
+                .orElseThrow(NotFoundException::new);
+        if (!bcryptPwEncoder.matches(passwords.oldPassword(), userOldPw)) {
+            throw new NotFoundException();
+        }
+        String hashedNewPassword = bcryptPwEncoder.encode(passwords.newPassword());
+
+        return repository.findById(id)
+                .map(user -> {
+                    user.setPassword(hashedNewPassword);
+                    repository.save(user);
+                    return HttpStatus.OK;
                 })
                 .orElseThrow(NotFoundException::new);
     }

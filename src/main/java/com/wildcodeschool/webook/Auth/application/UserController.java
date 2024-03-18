@@ -1,12 +1,15 @@
 package com.wildcodeschool.webook.Auth.application;
 
+import com.wildcodeschool.webook.Auth.domain.dto.PasswordDTO;
 import com.wildcodeschool.webook.Auth.domain.dto.UserDTO;
 import com.wildcodeschool.webook.Auth.domain.entity.User;
 import com.wildcodeschool.webook.Auth.domain.service.UserMapper;
 import com.wildcodeschool.webook.Auth.domain.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.ServerResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +42,10 @@ public class UserController {
     @PutMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO edit(@RequestBody User newUser, @PathVariable Long id) {
         return userService.updateUser(newUser, id);
+    }
+    @PatchMapping(value = "/users/{id}/pw")
+    public HttpStatus editPassword(@RequestBody PasswordDTO passwordDTO, @PathVariable Long id) {
+        return userService.updatePassword(passwordDTO, id);
     }
 
     @DeleteMapping("/users/{id}")
